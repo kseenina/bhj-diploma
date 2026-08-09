@@ -11,14 +11,18 @@ class TransactionsPage {
    * через registerEvents()
    * */
   constructor( element ) {
-
+    if (!element) {
+      throw new Error('Переданный элемент не существует');
+    }
+    this.element = element;
+    this.registerEvents();
   }
 
   /**
    * Вызывает метод render для отрисовки страницы
    * */
   update() {
-
+    this.render(this.lastOptions || {});
   }
 
   /**
@@ -28,7 +32,16 @@ class TransactionsPage {
    * TransactionsPage.removeAccount соответственно
    * */
   registerEvents() {
-
+    const removeAccountButton = this.element.querySelector('.remove-account');
+    const removeTransactionButtons = this.element.querySelectorAll('.transaction__remove');
+    removeAccountButton.addEventListener('click', () => {
+      this.removeAccount();
+    });
+    removeTransactionButtons.forEach(removeTransactionButton => {
+      removeTransactionButton.addEventListener('click', () => {
+        this.removeTransaction(removeTransactionButton.dataset.id);
+      });
+    });
   }
 
   /**
@@ -41,7 +54,18 @@ class TransactionsPage {
    * для обновления приложения
    * */
   removeAccount() {
-
+    if (!this.lastOptions) {
+      return;
+    }
+    if (confirm('Вы действительно хотите удалить счёт?')) {
+      Account.remove({ id: this.lastOptions.account_id }, (err, response) => {
+        if (response.success) {
+          App.updateWidgets();
+          App.updateForms();
+          this.clear();
+        }
+      });
+    }
   }
 
   /**
@@ -51,7 +75,13 @@ class TransactionsPage {
    * либо обновляйте текущую страницу (метод update) и виджет со счетами
    * */
   removeTransaction( id ) {
-
+    if (confirm('Вы действительно хотите удалить эту транзакцию?')) {
+      Transaction.remove(id, (err, response) => {
+        if (response.success) {
+          App.update();
+        }
+      });
+    }
   }
 
   /**
@@ -61,7 +91,20 @@ class TransactionsPage {
    * в TransactionsPage.renderTransactions()
    * */
   render(options){
-
+    if (!options) {
+      return
+    }
+    this.lastOptions = options;
+    Account.get(options.account_id, (err, response) => {
+      if (response.success) {
+        this.renderTitle(response.data.name);
+      }
+    });
+    Transaction.list(options, (err, response) => {
+      if (response.success) {
+        this.renderTransactions(response.data);
+      }
+    });
   }
 
   /**
@@ -70,14 +113,17 @@ class TransactionsPage {
    * Устанавливает заголовок: «Название счёта»
    * */
   clear() {
-
+    this.renderTransactions([]);
+    this.renderTitle('Название счёта');
+    this.lastOptions = null;
   }
 
   /**
    * Устанавливает заголовок в элемент .content-title
    * */
   renderTitle(name){
-
+    const contentTitle = this.element.querySelector('.content-title');
+    contentTitle.textContent = name;
   }
 
   /**
@@ -85,7 +131,21 @@ class TransactionsPage {
    * в формат «10 марта 2019 г. в 03:20»
    * */
   formatDate(date){
-
+    const dateObj = new Date(date);
+    const day = dateObj.getDate();
+    const month = dateObj.getMonth();
+    const year = dateObj.getFullYear();
+    const hours = format(dateObj.getHours());
+    const minutes = format(dateObj.getMinutes());
+    const monthNames = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+    function format(num) {
+      if (num < 10) {
+        return '0' + num;
+      }
+      return String(num);
+    }
+    const result = day + ' ' + monthNames[month] + ' ' + year + ' г. в ' + hours + ':' + minutes;
+    return result;
   }
 
   /**
@@ -93,7 +153,41 @@ class TransactionsPage {
    * item - объект с информацией о транзакции
    * */
   getTransactionHTML(item){
-
+    const newTransaction = document.createElement('div');
+    const type = item.type;
+    const date = this.formatDate(item.created_at);
+    const sum = item.sum;
+    const name = item.name;
+    const id = item.id;
+    newTransaction.classList.add('transaction', 'row');
+    if (type === 'income') {
+      newTransaction.classList.add('transaction_income');
+    }
+    if (type === 'expense') {
+      newTransaction.classList.add('transaction_expense');
+    }
+    newTransaction.innerHTML = `
+    <div class="col-md-7 transaction__details">
+      <div class="transaction__icon">
+          <span class="fa fa-money fa-2x"></span>
+      </div>
+      <div class="transaction__info">
+          <h4 class="transaction__title">${name}</h4>
+          <div class="transaction__date">${date}</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="transaction__summ">
+          ${sum} <span class="currency">₽</span>
+      </div>
+    </div>
+    <div class="col-md-2 transaction__controls">
+        <button class="btn btn-danger transaction__remove" data-id="${id}">
+            <i class="fa fa-trash"></i>  
+        </button>
+    </div>
+    `; 
+    return newTransaction;
   }
 
   /**
@@ -101,6 +195,11 @@ class TransactionsPage {
    * используя getTransactionHTML
    * */
   renderTransactions(data){
-
+    const transactionContent = this.element.querySelector('.transaction-content');
+    transactionContent.innerHTML = '';
+    data.forEach(item => {
+      const transaction = this.getTransactionHTML(item);
+      transactionContent.append(transaction);
+    });
   }
 }
