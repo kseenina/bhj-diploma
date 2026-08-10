@@ -33,7 +33,7 @@ const createRequest = (options = {}) => {
     };
     try {
         xhr.open(method, url);
-        xhr.send(sendData)
+        xhr.send(sendData);
     }
     catch(err) {
         callback(err);
