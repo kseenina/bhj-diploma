@@ -36,11 +36,12 @@ class AccountsWidget {
       const modal = App.getModal('createAccount');
       modal.open();
     });
-    const exitingAccounts = document.querySelectorAll('.account');
-    exitingAccounts.forEach(account => {
-      account.addEventListener('click', () => {
-        AccountsWidget.onSelectAccount(account);
-      });
+    this.element.addEventListener('click', (event) => {
+      const account = event.target.closest('.account');
+      if (!account) {
+        return
+      }
+      this.onSelectAccount(account);
     });
   }
 
@@ -93,7 +94,7 @@ class AccountsWidget {
       activeElement.classList.remove('active');
     }
     element.classList.add('active');
-    App.showPage('transaction', {account_id: element.dataset.id});
+    App.showPage('transactions', {account_id: element.dataset.id});
 
   }
 
@@ -109,7 +110,7 @@ class AccountsWidget {
     li.innerHTML = `
     <a href="#">
         <span>${item.name}</span> /
-        <span>${item.sum}</span>
+        <span>${item.sum} ₽</span>
     </a>
     `;
     return li;

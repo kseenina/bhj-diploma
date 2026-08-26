@@ -33,14 +33,15 @@ class TransactionsPage {
    * */
   registerEvents() {
     const removeAccountButton = this.element.querySelector('.remove-account');
-    const removeTransactionButtons = this.element.querySelectorAll('.transaction__remove');
     removeAccountButton.addEventListener('click', () => {
       this.removeAccount();
     });
-    removeTransactionButtons.forEach(removeTransactionButton => {
-      removeTransactionButton.addEventListener('click', () => {
-        this.removeTransaction(removeTransactionButton.dataset.id);
-      });
+    this.element.addEventListener('click', (event) => {
+      const btn = event.target.closest('.transaction__controls .btn-danger');
+      if (!btn) {
+        return
+      }
+      this.removeTransaction(btn.dataset.id);
     });
   }
 
@@ -76,8 +77,8 @@ class TransactionsPage {
    * */
   removeTransaction( id ) {
     if (confirm('Вы действительно хотите удалить эту транзакцию?')) {
-      Transaction.remove(id, (err, response) => {
-        if (response.success) {
+      Transaction.remove({ id }, (err, response) => {
+        if (response) {
           App.update();
         }
       });

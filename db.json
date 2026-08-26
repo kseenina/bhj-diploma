@@ -11,6 +11,12 @@
       "email": "123@mail.ru",
       "password": "123",
       "id": "7sm9eb0msmh76aq"
+    },
+    {
+      "name": "Ксения",
+      "email": "kseenina@gmail.com",
+      "password": "12345",
+      "id": "7sm97a8mtab9cm1"
     }
   ],
   "accounts": [
@@ -30,9 +36,9 @@
       "id": "3"
     },
     {
-      "name": "456",
+      "name": "новый счет",
       "user_id": "7sm9eb0msmh76aq",
-      "id": "7sm9fiomsmh7hni"
+      "id": "7sm9bo4mtab6lsz"
     }
   ],
   "transactions": [
@@ -172,22 +178,22 @@
       "user_id": "1"
     },
     {
-      "id": "7sm9f6wmsmhab55",
+      "id": "7sm9oomtab6u3w",
       "type": "income",
       "name": "денежки",
       "sum": 1000000,
-      "account_id": "7sm9fiomsmh7hni",
+      "account_id": "7sm9bo4mtab6lsz",
       "user_id": "7sm9eb0msmh76aq",
-      "created_at": "2026-08-10T00:13:25.864Z"
+      "created_at": "2026-08-26T16:29:14.347Z"
     },
     {
-      "id": "7sm9cjcmsmhdr72",
+      "id": "7sm968cmtaczfwk",
       "type": "expense",
       "name": "ушли денежки(((",
       "sum": 500,
-      "account_id": "7sm9fiomsmh7hni",
+      "account_id": "7sm9bo4mtab6lsz",
       "user_id": "7sm9eb0msmh76aq",
-      "created_at": "2026-08-10T00:16:06.637Z"
+      "created_at": "2026-08-26T17:19:28.579Z"
     }
   ]
 }
